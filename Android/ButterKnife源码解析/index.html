@@ -1,0 +1,606 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+      <link rel="shortcut icon" href="../../assets/book.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-6.1.6">
+    
+    
+      
+        <title>ButterKnife原理解析 - 客户端知识图谱</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6910b76c.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.196e0c26.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#009485">
+        
+      
+    
+    
+    
+      
+        
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+      <link rel="stylesheet" href="../../css/app.css">
+    
+    
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="teal" data-md-color-accent="white">
+      
+  
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#butterknife" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href="../.." title="客户端知识图谱" class="md-header-nav__button md-logo" aria-label="客户端知识图谱">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      
+        <div class="md-header-nav__ellipsis">
+          <span class="md-header-nav__topic md-ellipsis">
+            客户端知识图谱
+          </span>
+          <span class="md-header-nav__topic md-ellipsis">
+            
+              ButterKnife原理解析
+            
+          </span>
+        </div>
+      
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="客户端知识图谱" class="md-nav__button md-logo" aria-label="客户端知识图谱">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    客户端知识图谱
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../.." class="md-nav__link">
+      主页
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2" >
+    <label class="md-nav__link" for="nav-2">
+      Android基础
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Android基础" data-md-level="1">
+      <label class="md-nav__title" for="nav-2">
+        <span class="md-nav__icon md-icon"></span>
+        Android基础
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../activity/" class="md-nav__link">
+      【四大组件】Activity
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../service/" class="md-nav__link">
+      【四大组件】Service
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3" >
+    <label class="md-nav__link" for="nav-3">
+      Java基础
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Java基础" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        <span class="md-nav__icon md-icon"></span>
+        Java基础
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../Java/%E6%B3%A8%E8%A7%A3/" class="md-nav__link">
+      注解
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" >
+    <label class="md-nav__link" for="nav-4">
+      Kotlin基础
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="Kotlin基础" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        <span class="md-nav__icon md-icon"></span>
+        Kotlin基础
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../about/" class="md-nav__link">
+      None
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="nav-5" type="checkbox" id="nav-5" >
+    <label class="md-nav__link" for="nav-5">
+      跨平台技术
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="跨平台技术" data-md-level="1">
+      <label class="md-nav__title" for="nav-5">
+        <span class="md-nav__icon md-icon"></span>
+        跨平台技术
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../about/" class="md-nav__link">
+      None
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="nav-6" type="checkbox" id="nav-6" >
+    <label class="md-nav__link" for="nav-6">
+      CS理论基础
+      <span class="md-nav__icon md-icon"></span>
+    </label>
+    <nav class="md-nav" aria-label="CS理论基础" data-md-level="1">
+      <label class="md-nav__title" for="nav-6">
+        <span class="md-nav__icon md-icon"></span>
+        CS理论基础
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../CS/HTTP/" class="md-nav__link">
+      HTTP协议
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../about/" class="md-nav__link">
+      关于
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-butterknife" class="md-nav__link">
+    1. ButterKnife用法
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    2. 原理解析
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    3. 总结
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                <h1 id="butterknife">ButterKnife原理解析</h1>
+<p>基于ButterKnife 8.5.1</p>
+<h2 id="1-butterknife">1. ButterKnife用法</h2>
+<p><a href="http://jakewharton.github.io/butterknife/">Field and method binding for Android views</a></p>
+<p>ButterKnife可用的地方很多，Activity，Fragment，Dialog甚至是任意的Object，不过用法都大同小异。基本用法都是对View加上@BindView注解，然后在适当的地方调用ButterKnife.bind(target, source)方法。</p>
+<h2 id="2">2. 原理解析</h2>
+<p>这里以Fragment中的用法为例，下面的是ButterKnife官网上的例子。</p>
+<pre><code class="language-Java">public class FancyFragment extends Fragment {
+  @BindView(R.id.button1) Button button1;
+  @BindView(R.id.button2) Button button2;
+
+  @Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    View view = inflater.inflate(R.layout.fancy_fragment, container, false);
+    ButterKnife.bind(this, view);
+    // TODO Use fields...
+    return view;
+  }
+}
+</code></pre>
+<p>一步一步来分析源码。
+1. 首先从ButterKnife.bind(this, view)看，戳进源码：</p>
+<pre><code class="language-Java">@NonNull @UiThread
+  public static Unbinder bind(@NonNull Object target, @NonNull View source) {
+    return createBinding(target, source);
+  }
+</code></pre>
+<p>这里调用了createBinding方法, 返回一个Unbinder对象。</p>
+<ol>
+<li>继续往下看，createBinding方法是怎么创建Unbinder对象的：</li>
+</ol>
+<pre><code class="language-Java">private static Unbinder createBinding(@NonNull Object target, @NonNull View source) {
+    Class&lt;?&gt; targetClass = target.getClass();
+    if (debug) Log.d(TAG, &quot;Looking up binding for &quot; + targetClass.getName());
+    Constructor&lt;? extends Unbinder&gt; constructor = findBindingConstructorForClass(targetClass);
+
+    if (constructor == null) {
+      return Unbinder.EMPTY;
+    }
+    //...
+    try {
+      return constructor.newInstance(target, source);
+    } //省略异常处理的代码
+}
+</code></pre>
+<p>可以看到，这里是找到通过targetClass找到一个Unbinder类的构造方法，并通过构造方法产生一个Unbinder对象，具体到上面的例子中，targetClass就是我们的FancyFragment。</p>
+<ol>
+<li>再继续看怎么找构造方法的，点开findBindingConstructorForClass方法：</li>
+</ol>
+<pre><code class="language-Java">@Nullable @CheckResult @UiThread
+ private static Constructor&lt;? extends Unbinder&gt; findBindingConstructorForClass(Class&lt;?&gt; cls) {
+   //BINDINGS是一个HashMap&lt;class, Constructor&gt;
+   Constructor&lt;? extends Unbinder&gt; bindingCtor = BINDINGS.get(cls);
+   if (bindingCtor != null) {
+     if (debug) Log.d(TAG, &quot;HIT: Cached in binding map.&quot;);
+     return bindingCtor;
+   }
+   String clsName = cls.getName();
+   //忽略调android和java包下的类
+   if (clsName.startsWith(&quot;android.&quot;) || clsName.startsWith(&quot;java.&quot;)) {
+     if (debug) Log.d(TAG, &quot;MISS: Reached framework class. Abandoning search.&quot;);
+     return null;
+   }
+   try {
+     //新建一个ViewBinding类
+     Class&lt;?&gt; bindingClass = Class.forName(clsName + &quot;_ViewBinding&quot;);
+     //noinspection unchecked
+     bindingCtor = (Constructor&lt;? extends Unbinder&gt;) bindingClass.getConstructor(cls, View.class);
+     if (debug) Log.d(TAG, &quot;HIT: Loaded binding class and constructor.&quot;);
+   } catch (ClassNotFoundException e) {
+     if (debug) Log.d(TAG, &quot;Not found. Trying superclass &quot; + cls.getSuperclass().getName());
+     bindingCtor = findBindingConstructorForClass(cls.getSuperclass());
+   } catch (NoSuchMethodException e) {
+     throw new RuntimeException(&quot;Unable to find binding constructor for &quot; + clsName, e);
+   }
+   BINDINGS.put(cls, bindingCtor);
+   return bindingCtor;
+ }
+</code></pre>
+<p>这里代码也很简单，先从一个HashMap也就是BINDINGS中找，如果没有的话，就通过反射的方法新建实例化一个类然后取其构造方法，这个类的类名是clsName_ViewBinding，具体到上面的例子，就是创建了一个FancyFragment_ViewBinding的对象。之后，将这个对象的构造方法存入HashMap中。</p>
+<p>那么这个BINDINGS是什么呢？翻源码也可以看到，它是一个静态的HashMap，以class为key，value是构造方法，在这里，其实它就相当于一个缓存，只要ButterKnife.bind(...)方法调用过一次，下次就可以直接找到相关的_ViewBinding的构造方法。</p>
+<p>看到这里，稍微有一点点疑问，这里 <em>为什么只缓存构造方法，再通过构造方法实例化_ViewBinding对象，而不是把_ViewBinding对象缓存起来呢？</em> 下面会解答。</p>
+<ol>
+<li>具体到我们最开始Fragment中ButterKnife使用的例子，到这里可以整理一下思路。在FancyFragment的onCreateView(...)方法中，我们调用了ButterKnife.bind(this, view)方法，调用这个方法之后，最终是通过构造方法实例化了一个类，即FancyFragment_ViewBinding。这个类是什么呢？肯定不能实例化一个不存在的类，编译完成之后，在项目中搜索一下这个类，会发现这个类在build文件夹下，是在编译期自动生成的，看一下这个类实现：</li>
+</ol>
+<pre><code class="language-Java">public class FancyFragment_ViewBinding implements Unbinder {
+  private FancyFragment target;
+
+  @UiThread
+  public FancyFragment_ViewBinding(FancyFragment target, View source) {
+    this.target = target;
+
+    target.button1 = Utils.findRequiredViewAsType(source, R.id.button1, &quot;field 'button1'&quot;, Button.class);
+    target.button2 = Utils.findRequiredViewAsType(source, R.id.button2, &quot;field 'button2'&quot;, Button.class);
+  }
+
+  @Override
+  @CallSuper
+  public void unbind() {
+    ChannelAudioFragment target = this.target;
+    if (target == null) throw new IllegalStateException(&quot;Bindings already cleared.&quot;);
+    this.target = null;
+
+    target.button1 = null;
+    target.button2 = null;
+  }
+}
+</code></pre>
+<p>看到这里3中的问题也就很很好解释了，ViewBinding对象中保存了targetClass的对象，也就是FancyFragment_ViewBinding中保存了FancyFragment对象，如果缓存了targetClass对象，就会使得FancyFragment被放在了静态的HashMap中，一直得不到释放，最终造成内存泄漏。</p>
+<p>这里代码也很明确，Utils.findRequiredViewAsType(...)就是调用view.findViewById(id)方法，然后通过反射进行一下强制类型转换，这样就找到了id对应的view，然后复制给targetClass中注解的属性。整个流程也就省去了我们手写findViewById(id)方法的过程。</p>
+<p>这个FancyFragment_ViewBinding类是怎么生成的呢？毫无疑问肯定是根据注解生成的了，具体怎么生成，以后有时间在看源码。</p>
+<h2 id="3">3. 总结</h2>
+<p>经过上面的分析，整个ButterKnife的原理也就清晰了。编译时，对有注解的target类生成_ViewBinding类，这个类的属性中保存了target对象，构造方法中，通过调用findViewById找到View，并给target类有注解的View赋值。</p>
+<p>绑定的时候，调用ButterKnife.bind(target, source)，通过target的类找到缓存的target对应的_ViewBinding类的构造方法，并实例化它，没找到的化，直接通过类名来实例化，然后缓存。在实例化_ViewBinding类的过程中，就直接调用了findViewById方法。</p>
+<p>以上是BindView的过程，当然，ButterKnife其它的绑定方法，比如绑定点击事件，也是同样的原理。</p>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            Copyright &copy; 2020 Ivan J. Lee.
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../assets/javascripts/vendor.fd16492e.min.js"></script>
+      <script src="../../assets/javascripts/bundle.7836ba4d.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "\u590d\u5236", "clipboard.copied": "\u5df2\u590d\u5236", "search.config.lang": "ja", "search.config.pipeline": "trimmer, stemmer", "search.config.separator": "[\\uff0c\\u3002]+", "search.placeholder": "\u641c\u7d22", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}</script>
+      
+      <script>
+        app = initialize({
+          base: "../..",
+          features: [],
+          search: Object.assign({
+            worker: "../../assets/javascripts/worker/search.4ac00218.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+    
+  </body>
+</html>
